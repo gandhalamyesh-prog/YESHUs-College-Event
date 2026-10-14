@@ -1,0 +1,578 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YESHU's College Event Management System</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #071b35;
+    color: #222;
+}
+header {
+    background-image: url("event-background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    text-align: center;
+    padding: 75px 20px;
+    min-height: 300px;
+    box-sizing: border-box;
+}
+
+
+nav {
+    background: #102044;
+    padding: 14px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 12px;
+    font-weight: bold;
+}
+
+.container {
+    width: 92%;
+    max-width: 1200px;
+    margin: 25px auto;
+}
+
+.card {
+    background: white;
+    padding: 24px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px #00000012;
+}
+
+h2 {
+    color: #192a56;
+    border-bottom: 2px solid #e8ebf5;
+    padding-bottom: 12px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width { grid-column: 1 / -1; }
+
+label {
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd2e1;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+button {
+    padding: 12px 18px;
+    margin: 4px 3px 4px 0;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled { opacity: .6; cursor: not-allowed; }
+
+.add { background: #218c54; }
+.update { background: #273c75; }
+.delete { background: #c0392b; }
+.clear { background: #636e72; }
+.refresh { background: #0984e3; }
+
+#message {
+    display: none;
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 6px;
+    overflow-wrap: anywhere;
+}
+
+#message.success { display: block; background: #dff5e7; color: #176b36; }
+#message.error { display: block; background: #ffe5e5; color: #a52222; }
+#message.info { display: block; background: #e4efff; color: #193b75; }
+
+.table-wrapper { overflow-x: auto; }
+
+table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #e0e3eb;
+    padding: 11px;
+    text-align: left;
+}
+
+th { background: #192a56; color: white; }
+tbody tr:nth-child(even) { background: #f5f7fc; }
+
+footer {
+    background: #192a56;
+    color: white;
+    text-align: center;
+    padding: 16px;
+}
+
+@media (max-width: 650px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: auto; }
+    .container { width: 95%; }
+    .card { padding: 16px; }
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #071b35;
+    color: #18243a;
+}
+
+header {
+    background:
+        linear-gradient(rgba(5, 20, 43, 0.25), rgba(5, 20, 43, 0.4)),
+        url("event-background.png") center/cover no-repeat;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+    padding-top: 95px;
+}
+
+header h1 {
+    font-size: 34px;
+    margin-top: 35px;
+    margin-bottom: 18px;
+}
+
+header p {
+    font-size: 17px;
+}
+
+nav {
+    background: rgba(7, 24, 43, 0.97);
+    text-align: center;
+    padding: 16px;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    margin: 0 16px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav a:hover,
+nav a.active {
+    color: #f4c65e;
+}
+
+button {
+    background: linear-gradient(135deg, #d9a83e, #f5d783);
+    color: #14243b;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #c18c24;
+    color: white;
+}
+
+section,
+.container {
+    background: #fff9ed;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>YESHU's College Event Management System</h1>
+    <p>Organize, manage and track college events easily</p>
+</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#eventFormSection">Manage Events</a>
+    <a href="#eventListSection">View Events</a>
+</nav>
+
+<main class="container" id="home">
+
+<div id="message" role="status" aria-live="polite"></div>
+
+<section class="card" id="eventFormSection">
+    <h2>Manage College Events</h2>
+
+    <!-- Dropdown to select an existing event -->
+    <div class="form-group" style="margin-bottom:20px;">
+        <label for="eventSelect">Select Existing Event</label>
+        <select id="eventSelect">
+            <option value="">-- Select an Event --</option>
+        </select>
+    </div>
+
+    <form id="eventForm">
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label for="eventId">Event ID</label>
+                <input type="text" id="eventId"
+                       placeholder="Generated automatically" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="eventName">Event Name *</label>
+                <input type="text" id="eventName"
+                       maxlength="100" required
+                       placeholder="Enter event name">
+            </div>
+
+            <div class="form-group">
+                <label for="eventType">Event Type *</label>
+                <input type="text" id="eventType"
+                       maxlength="50" required
+                       placeholder="Enter event type">
+            </div>
+
+            <div class="form-group">
+                <label for="eventDate">Event Date *</label>
+                <input type="date" id="eventDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="venue">Venue *</label>
+                <input type="text" id="venue"
+                       maxlength="100" required
+                       placeholder="Enter venue">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="description">Description</label>
+                <textarea id="description"
+                          placeholder="Enter event description"></textarea>
+            </div>
+
+        </div>
+
+        <div style="margin-top:20px;">
+            <button type="submit" class="add" id="addButton">Add Event</button>
+            <button type="button" class="update" id="updateButton">Update Event</button>
+            <button type="button" class="delete" id="deleteButton">Delete Event</button>
+            <button type="button" class="clear" id="clearButton">Clear Form</button>
+        </div>
+    </form>
+</section>
+
+<section class="card" id="eventListSection">
+    <h2>All College Events</h2>
+    <button type="button" class="refresh" id="refreshButton">Refresh Events</button>
+    <p id="eventCount">Loading events...</p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Event ID</th>
+                    <th>Event Name</th>
+                    <th>Event Type</th>
+                    <th>Event Date</th>
+                    <th>Venue</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="eventTable">
+                <tr><td colspan="6">Loading events...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <p>&copy; 2026 YESHU's College Event Management System</p>
+</footer>
+
+<script>
+const API_URL = "/events";
+
+const form = document.getElementById("eventForm");
+const eventSelect = document.getElementById("eventSelect");
+const eventId = document.getElementById("eventId");
+const eventName = document.getElementById("eventName");
+const eventType = document.getElementById("eventType");
+const eventDate = document.getElementById("eventDate");
+const venue = document.getElementById("venue");
+const description = document.getElementById("description");
+const eventTable = document.getElementById("eventTable");
+const eventCount = document.getElementById("eventCount");
+const message = document.getElementById("message");
+
+let events = [];
+
+function showMessage(text, type = "info") {
+    message.textContent = text;
+    message.className = type;
+}
+
+function hideMessage() {
+    message.textContent = "";
+    message.className = "";
+}
+
+async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        }
+    });
+
+    const text = await response.text();
+    let data;
+
+    try {
+        data = text ? JSON.parse(text) : null;
+    } catch {
+        data = text;
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            data && typeof data === "object"
+                ? data.message || data.error || JSON.stringify(data)
+                : data || "Request failed"
+        );
+    }
+
+    return data;
+}
+
+function getFormData() {
+    return {
+        event_name: eventName.value.trim(),
+        event_type: eventType.value.trim(),
+        event_date: eventDate.value,
+        venue: venue.value.trim(),
+        description: description.value.trim()
+    };
+}
+
+function formatDate(value) {
+    return value ? String(value).substring(0, 10) : "";
+}
+
+function addCell(row, value) {
+    const cell = document.createElement("td");
+    cell.textContent = value == null ? "" : String(value);
+    row.appendChild(cell);
+}
+
+async function loadEvents() {
+    try {
+        events = await apiRequest(API_URL);
+
+        if (!Array.isArray(events)) {
+            throw new Error("The server did not return an event list.");
+        }
+
+        eventSelect.replaceChildren();
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "-- Select an Event --";
+        eventSelect.appendChild(placeholder);
+
+        events.forEach(event => {
+            const option = document.createElement("option");
+            option.value = event.event_id;
+            option.textContent = event.event_id + " - " + event.event_name;
+            eventSelect.appendChild(option);
+        });
+
+        eventTable.replaceChildren();
+
+        if (events.length === 0) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+            cell.colSpan = 6;
+            cell.textContent = "No events found. Add your first event.";
+            row.appendChild(cell);
+            eventTable.appendChild(row);
+        } else {
+            events.forEach(event => {
+                const row = document.createElement("tr");
+                addCell(row, event.event_id);
+                addCell(row, event.event_name);
+                addCell(row, event.event_type);
+                addCell(row, formatDate(event.event_date));
+                addCell(row, event.venue);
+                addCell(row, event.description);
+                eventTable.appendChild(row);
+            });
+        }
+
+        eventCount.textContent = "Total events: " + events.length;
+    } catch (error) {
+        showMessage("Unable to load events: " + error.message, "error");
+        eventCount.textContent = "Could not load events.";
+    }
+}
+
+// Fill the form when an event is selected from the dropdown
+eventSelect.addEventListener("change", () => {
+    hideMessage();
+
+    const selected = events.find(
+        event => String(event.event_id) === eventSelect.value
+    );
+
+    if (!selected) {
+        clearForm();
+        return;
+    }
+
+    eventId.value = selected.event_id;
+    eventName.value = selected.event_name || "";
+    eventType.value = selected.event_type || "";
+    eventDate.value = formatDate(selected.event_date);
+    venue.value = selected.venue || "";
+    description.value = selected.description || "";
+});
+
+// ADD EVENT
+form.addEventListener("submit", async event => {
+    event.preventDefault();
+    hideMessage();
+
+    if (!form.reportValidity()) return;
+
+    const button = document.getElementById("addButton");
+    button.disabled = true;
+
+    try {
+        const result = await apiRequest(API_URL, {
+            method: "POST",
+            body: JSON.stringify(getFormData())
+        });
+
+        showMessage(
+            (result.message || "Event added successfully!") +
+            (result.event_id ? " Event ID: " + result.event_id : ""),
+            "success"
+        );
+
+        clearForm();
+        await loadEvents();
+    } catch (error) {
+        showMessage("Add failed: " + error.message, "error");
+    } finally {
+        button.disabled = false;
+    }
+});
+
+// UPDATE SELECTED EVENT
+document.getElementById("updateButton").addEventListener("click", async () => {
+    hideMessage();
+
+    if (!eventSelect.value) {
+        showMessage("Please select an event from the dropdown first.", "error");
+        return;
+    }
+
+    if (!form.reportValidity()) return;
+
+    try {
+        const result = await apiRequest(
+            API_URL + "/" + encodeURIComponent(eventSelect.value),
+            {
+                method: "PUT",
+                body: JSON.stringify(getFormData())
+            }
+        );
+
+        showMessage(result.message || "Event updated successfully!", "success");
+        clearForm();
+        await loadEvents();
+    } catch (error) {
+        showMessage("Update failed: " + error.message, "error");
+    }
+});
+
+// DELETE SELECTED EVENT
+document.getElementById("deleteButton").addEventListener("click", async () => {
+    if (!eventSelect.value) {
+        showMessage("Please select an event from the dropdown first.", "error");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete this event?")) return;
+
+    try {
+        const result = await apiRequest(
+            API_URL + "/" + encodeURIComponent(eventSelect.value),
+            { method: "DELETE" }
+        );
+
+        showMessage(result.message || "Event deleted successfully!", "success");
+        clearForm();
+        await loadEvents();
+    } catch (error) {
+        showMessage("Delete failed: " + error.message, "error");
+    }
+});
+
+function clearForm() {
+    form.reset();
+    eventId.value = "";
+    eventSelect.value = "";
+    hideMessage();
+}
+
+document.getElementById("clearButton").addEventListener("click", clearForm);
+document.getElementById("refreshButton").addEventListener("click", loadEvents);
+
+loadEvents();
+</script>
+
+</body>
+</html>
